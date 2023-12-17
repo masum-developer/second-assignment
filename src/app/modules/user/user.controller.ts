@@ -29,8 +29,23 @@ const getAllUser = async (req: Request, res: Response) => {
         console.log(err);
     }
 }
+const getSingleStudent = async (req: Request, res: Response) => {
+    try {
+        const userId = req.params.userId;
+        const result = await UserServices.getSingleUserFromDB(userId)
+        res.status(200).json({
+            success: true,
+            message: 'User fetched successfully!',
+            data: result
+        })
+
+    } catch (err) {
+        console.log(err);
+    }
+}
 
 export const UserControllers = {
     createUser,
-    getAllUser
+    getAllUser,
+    getSingleStudent
 }
