@@ -1,8 +1,11 @@
-import { IUser } from './user.interface';
+import { TUser } from './user.interface';
 import { User } from './user.model';
 
-const createUserIntoDB = async (user: IUser) => {
-  const result = await User.create(user);
+const createUserIntoDB = async (userData: TUser) => {
+  if (await User.isUserExists(userData.userId)) {
+    throw new Error('User already existst my')
+  }
+  const result = await User.create(userData); // built in static method
   return result;
 };
 const getAllUsersFromDB = async () => {

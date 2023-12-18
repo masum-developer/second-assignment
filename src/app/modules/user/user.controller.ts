@@ -16,15 +16,14 @@ const createUser = async (req: Request, res: Response) => {
       message: 'User created successfully!',
       data: result,
     });
-  } catch (err) {
+  } catch (err: any) {
 
     res.status(500).json({
       success: false,
-      message: 'Please Insert data Carefully',
+      message: err.message || 'Please Insert data Carefully',
       error: {
         'code': 500,
-        'description': 'Please Insert data Carefully',
-        'emn': err
+        'description': err.message || 'Please Insert data Carefully',
       },
     });
   }
