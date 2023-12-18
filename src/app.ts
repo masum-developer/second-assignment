@@ -7,11 +7,11 @@ const app: Application = express();
 app.use(express.json());
 app.use(cors());
 
-app.use('/api/users', UserRoutes)
+app.use('/api/users', UserRoutes);
 
 app.get('/', (req: Request, res: Response) => {
   // const a = 10;
-  res.send("Masum");
+  res.send('Masum');
 });
 
 // console.log(process.cwd());
