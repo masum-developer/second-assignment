@@ -25,10 +25,11 @@ export type TUser = {
     fullName: TFullName;
     age: number;
     email: string;
-    isActive: true | false;
+    isActive: boolean;
     hobbies: string[];
     address: TAddress;
     orders?: TOrders[];
+    isDeleted: boolean;
 };
 
 // for creating static

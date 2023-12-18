@@ -46,17 +46,38 @@ const userSchema = new Schema<TUser, UserModel>({
     hobbies: { type: [String], required: true },
     address: { type: addressSchema, required: true },
     orders: { type: [ordersSchema] },
+    isDeleted: {
+        type: Boolean,
+        default: false
+    }
 });
 
 userSchema.pre('save', async function (next) {
-    // console.log(this, 'pre hook');
+
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     const user = this
+    //hash password
     user.password = await bcrypt.hash(user.password, Number(config.bcrypt_salt_rounds))
     next()
 })
-userSchema.post('save', function () {
-    console.log(this, 'post hook');
+userSchema.post('save', function (doc, next) {
+    doc.password = ''
+    // password empty
+    next()
+})
+
+// Query Middleware
+userSchema.pre('find', function (next) {
+    this.find({ isDeleted: { $ne: true } })
+    next()
+})
+userSchema.pre('findOne', function (next) {
+    this.find({ isDeleted: { $ne: true } })
+    next()
+})
+userSchema.pre('aggregate', function (next) {
+    this.pipeline().unshift({ $match: { isDeleted: { $ne: true } } })
+    next()
 })
 
 // creating custom static method
