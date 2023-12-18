@@ -1,5 +1,7 @@
 import { Schema, model } from 'mongoose';
 import { TAddress, TFullName, TOrders, TUser, UserModel } from './user.interface';
+import bcrypt from 'bcrypt'
+import config from '../../config';
 
 const fullNameSchema = new Schema<TFullName>({
     firstName: {
@@ -45,6 +47,17 @@ const userSchema = new Schema<TUser, UserModel>({
     address: { type: addressSchema, required: true },
     orders: { type: [ordersSchema] },
 });
+
+userSchema.pre('save', async function (next) {
+    // console.log(this, 'pre hook');
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
+    const user = this
+    user.password = await bcrypt.hash(user.password, Number(config.bcrypt_salt_rounds))
+    next()
+})
+userSchema.post('save', function () {
+    console.log(this, 'post hook');
+})
 
 // creating custom static method
 userSchema.statics.isUserExists = async function (userId: number) {
