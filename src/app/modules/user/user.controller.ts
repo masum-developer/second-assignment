@@ -48,7 +48,8 @@ const getAllUser = async (req: Request, res: Response) => {
 };
 const getSingleUser = async (req: Request, res: Response) => {
   try {
-    const { userId } = req.params;
+    const userId = parseInt(req.params.userId);
+
     const result = await UserServices.getSingleUserFromDB(userId);
     res.status(200).json({
       success: true,
@@ -73,6 +74,8 @@ const updateSingleUser = async (req: Request, res: Response) => {
     const responseData = userBody;
     responseData.userId = userId;
 
+    // const r = await UserServices.getSingleUserFromDB(userId);
+    // responseData.username = r.username;
     const result = await UserServices.updateSingleUserFromDB(userId, userBody);
     res.status(200).json({
       success: true,
@@ -113,10 +116,10 @@ const deleteSingleUser = async (req: Request, res: Response) => {
 }
 const appendNewProductInOrder = async (req: Request, res: Response) => {
   try {
-    const { userId } = req.params;
-    const userBody = req.body;
+    const userId = parseInt(req.params.userId);
+    const productBody = req.body;
     // console.log('controler', userBody)
-    const result = await UserServices.appendNewProductInOrderToDB(userId, userBody);
+    const result = await UserServices.appendNewProductInOrderToDB(userId, productBody);
 
     res.status(200).json({
       success: true,
@@ -134,6 +137,48 @@ const appendNewProductInOrder = async (req: Request, res: Response) => {
     });
   }
 }
+const allOrderForSpecificUser = async (req: Request, res: Response) => {
+  try {
+    const userId = parseInt(req.params.userId);
+
+    const result = await UserServices.allOrderForSpecificUserFromDB(userId);
+    res.status(200).json({
+      success: true,
+      message: 'Order fetched successfully!',
+      data: result,
+    });
+  } catch (err: any) {
+    res.status(404).json({
+      success: false,
+      message: err.message || 'User not found',
+      error: {
+        'code': 404,
+        'description': 'User not found!',
+      },
+    });
+  }
+}
+const allOrderTotalPriceForSpecificUser = async (req: Request, res: Response) => {
+  try {
+    const userId = parseInt(req.params.userId);
+    const result = await UserServices.allOrderTotalPriceForSpecificUserFromDB(userId);
+
+    res.status(200).json({
+      success: true,
+      message: 'Total price calculated successfully!',
+      data: result
+    });
+  } catch (err: any) {
+    res.status(404).json({
+      success: false,
+      message: err.message || 'User not found',
+      error: {
+        'code': 404,
+        'description': 'User not found!',
+      },
+    });
+  }
+}
 
 export const UserControllers = {
   createUser,
@@ -141,5 +186,7 @@ export const UserControllers = {
   getSingleUser,
   deleteSingleUser,
   updateSingleUser,
-  appendNewProductInOrder
+  appendNewProductInOrder,
+  allOrderForSpecificUser,
+  allOrderTotalPriceForSpecificUser
 };
