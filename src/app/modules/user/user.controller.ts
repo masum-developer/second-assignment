@@ -46,7 +46,7 @@ const getAllUser = async (req: Request, res: Response) => {
     });
   }
 };
-const getSingleStudent = async (req: Request, res: Response) => {
+const getSingleUser = async (req: Request, res: Response) => {
   try {
     const { userId } = req.params;
     const result = await UserServices.getSingleUserFromDB(userId);
@@ -66,6 +66,30 @@ const getSingleStudent = async (req: Request, res: Response) => {
     });
   }
 };
+const updateSingleUser = async (req: Request, res: Response) => {
+  try {
+    const { userId } = req.params;
+    const userBody = req.body;
+    const responseData = userBody;
+    responseData.userId = userId;
+
+    const result = await UserServices.updateSingleUserFromDB(userId, userBody);
+    res.status(200).json({
+      success: true,
+      message: 'User updated successfully!',
+      data: result.modifiedCount > 0 ? responseData : result,
+    });
+  } catch (err: any) {
+    res.status(404).json({
+      success: false,
+      message: err.message || 'User not found',
+      error: {
+        'code': 404,
+        'description': 'User not found!',
+      },
+    });
+  }
+}
 const deleteSingleUser = async (req: Request, res: Response) => {
   try {
     const { userId } = req.params;
@@ -87,10 +111,35 @@ const deleteSingleUser = async (req: Request, res: Response) => {
     });
   }
 }
+const appendNewProductInOrder = async (req: Request, res: Response) => {
+  try {
+    const { userId } = req.params;
+    const userBody = req.body;
+    // console.log('controler', userBody)
+    const result = await UserServices.appendNewProductInOrderToDB(userId, userBody);
+
+    res.status(200).json({
+      success: true,
+      message: 'Order created successfully!',
+      data: result.modifiedCount > 0 ? null : result,
+    });
+  } catch (err: any) {
+    res.status(404).json({
+      success: false,
+      message: err.message || 'Something went wrong',
+      error: {
+        'code': 404,
+        'description': 'Something went wrong!',
+      },
+    });
+  }
+}
 
 export const UserControllers = {
   createUser,
   getAllUser,
-  getSingleStudent,
+  getSingleUser,
   deleteSingleUser,
+  updateSingleUser,
+  appendNewProductInOrder
 };

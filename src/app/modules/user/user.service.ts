@@ -1,4 +1,4 @@
-import { TUser } from './user.interface';
+import { TOrders, TUser } from './user.interface';
 import { User } from './user.model';
 
 const createUserIntoDB = async (userData: TUser) => {
@@ -29,14 +29,55 @@ const getSingleUserFromDB = async (id: number) => {
   }
 
 };
+const updateSingleUserFromDB = async (userId: number, userData: TUser) => {
+  console.log('service', userId);
+  console.log('service', userData);
+
+  const updateBody = {
+    fullName: {
+      firstName: userData.fullName.firstName,
+      lastName: userData.fullName.lastName
+    },
+    email: userData.email
+  }
+  const result = await User.updateOne(
+    { userId: userId },
+    updateBody
+  );
+
+  return result;
+
+}
 const deleteSingleUserFromDB = async (id: number) => {
   const result = await User.updateOne({ userId: id }, { isDeleted: true })
   return result;
+}
+const appendNewProductInOrderToDB = async (userId: number, orderData: TOrders) => {
+  console.log('service', userId);
+  console.log('service', orderData);
+  const orders = []
+  orders.push({
+    productName: orderData.productName,
+    price: orderData.price,
+    quantity: orderData.quantity
+  })
+  const updateBody = {
+    orders
+  }
+  const result = await User.updateOne(
+    { userId: userId },
+    updateBody
+  );
+
+  return result;
+
 }
 
 export const UserServices = {
   createUserIntoDB,
   getAllUsersFromDB,
   getSingleUserFromDB,
+  updateSingleUserFromDB,
   deleteSingleUserFromDB,
+  appendNewProductInOrderToDB,
 };
