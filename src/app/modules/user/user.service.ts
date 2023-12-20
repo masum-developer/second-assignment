@@ -36,8 +36,33 @@ const updateSingleUserFromDB = async (userId: number, userData: TUser) => {
 
   if (await User.isUserExists(userId)) {
     if (await User.isUserNameExists(userData.username)) {
+      if (await User.isUserExists(userId) && await User.isUserNameExists(userData.username)) {
+        const updateBody = {
+          username: userData.username,
+          fullName: {
+            firstName: userData.fullName.firstName,
+            lastName: userData.fullName.lastName
+          },
+          age: userData.age,
+          email: userData.email,
+          isActive: userData.isActive,
+          hobbies: userData.hobbies,
+          address: {
+            street: userData.address.street,
+            city: userData.address.city,
+            country: userData.address.country
+          }
+        }
+        const result = await User.updateOne(
+          { userId: userId },
+          updateBody
+        );
+        return result;
+      }
+      else {
+        throw new Error('Username Already Exists')
+      }
 
-      throw new Error('Username Already Exists')
     } else {
 
       const updateBody = {
@@ -70,27 +95,37 @@ const updateSingleUserFromDB = async (userId: number, userData: TUser) => {
 
 }
 const deleteSingleUserFromDB = async (id: number) => {
-  const result = await User.updateOne({ userId: id }, { isDeleted: true })
-  return result;
+  if (await User.isUserExists(id)) {
+    const result = await User.updateOne({ userId: id }, { isDeleted: true })
+    return result;
+  }
+  else {
+    throw new Error('User not found')
+  }
 }
 const appendNewProductInOrderToDB = async (userId: number, productBody: TOrders) => {
-  const userData = await User.findOne({ userId: userId });
-  if (userData) {
-    const orders = userData.orders
-    orders?.push({
-      productName: productBody.productName,
-      price: productBody.price,
-      quantity: productBody.quantity
-    })
-    const updateBody = {
-      orders
-    }
-    const result = await User.updateOne(
-      { userId: userId },
-      updateBody
-    );
+  if (await User.isUserExists(userId)) {
+    const userData = await User.findOne({ userId: userId });
+    if (userData) {
+      const orders = userData.orders
+      orders?.push({
+        productName: productBody.productName,
+        price: productBody.price,
+        quantity: productBody.quantity
+      })
+      const updateBody = {
+        orders
+      }
+      const result = await User.updateOne(
+        { userId: userId },
+        updateBody
+      );
 
-    return result;
+      return result;
+    }
+  }
+  else {
+    throw new Error('User not found')
   }
 
 
@@ -115,7 +150,6 @@ const allOrderTotalPriceForSpecificUserFromDB = async (id: number) => {
     ])
 
     let totalCost = 0;
-
     result.forEach(item => {
       item.orders.forEach((order: { price: number; quantity: number; }) => {
         totalCost += order.price * order.quantity;

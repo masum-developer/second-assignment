@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { UserServices } from './user.service';
 import userValidationSchema from './user.validation';
 
+
 const createUser = async (req: Request, res: Response) => {
   try {
 
@@ -34,14 +35,13 @@ const getAllUser = async (req: Request, res: Response) => {
       message: 'Users fetched successfully!',
       data: result,
     });
-  } catch (err) {
+  } catch (err: any) {
     res.status(500).json({
       success: false,
       message: 'Something Wrong',
       error: {
         'code': 500,
-        'description': 'Something Wrong',
-        'emn': err
+        'description': err.message || 'Something Wrong'
       },
     });
   }
@@ -69,13 +69,13 @@ const getSingleUser = async (req: Request, res: Response) => {
 };
 const updateSingleUser = async (req: Request, res: Response) => {
   try {
-    const { userId } = req.params;
+    const userId = parseInt(req.params.userId);
+
     const userBody = req.body;
     const responseData = userBody;
     responseData.userId = userId;
 
-    // const r = await UserServices.getSingleUserFromDB(userId);
-    // responseData.username = r.username;
+
     const result = await UserServices.updateSingleUserFromDB(userId, userBody);
     res.status(200).json({
       success: true,
@@ -88,14 +88,14 @@ const updateSingleUser = async (req: Request, res: Response) => {
       message: err.message || 'User not found',
       error: {
         'code': 404,
-        'description': 'User not found!',
+        'description': err.message || 'User not found!',
       },
     });
   }
 }
 const deleteSingleUser = async (req: Request, res: Response) => {
   try {
-    const { userId } = req.params;
+    const userId = parseInt(req.params.userId);
     const result = await UserServices.deleteSingleUserFromDB(userId)
     res.status(200).json({
       success: true,
@@ -118,13 +118,12 @@ const appendNewProductInOrder = async (req: Request, res: Response) => {
   try {
     const userId = parseInt(req.params.userId);
     const productBody = req.body;
-    // console.log('controler', userBody)
     const result = await UserServices.appendNewProductInOrderToDB(userId, productBody);
 
     res.status(200).json({
       success: true,
       message: 'Order created successfully!',
-      data: result.modifiedCount > 0 ? null : result,
+      data: result && result.modifiedCount > 0 ? null : result,
     });
   } catch (err: any) {
     res.status(404).json({
