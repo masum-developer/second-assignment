@@ -10,7 +10,7 @@ app.use(cors());
 app.use('/api/users', UserRoutes);
 
 app.get('/', (req: Request, res: Response) => {
-  res.send('Masum');
+  res.send('My Second Assignment is running');
 });
 
 export default app;

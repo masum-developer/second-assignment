@@ -6,7 +6,8 @@ import userValidationSchema from './user.validation';
 const createUser = async (req: Request, res: Response) => {
   try {
 
-    const { user: userData } = req.body;
+    const userData = req.body;
+    console.log(userData);
     const zodParseData = userValidationSchema.parse(userData)
     const result = await UserServices.createUserIntoDB(zodParseData);
 
@@ -103,7 +104,7 @@ const deleteSingleUser = async (req: Request, res: Response) => {
       data: result.upsertedId,
     });
   }
-  catch (err: any) {
+  catch (err: unknown) {
     res.status(404).json({
       success: false,
       message: 'User not found',
